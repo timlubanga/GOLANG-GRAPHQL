@@ -33,14 +33,17 @@ func InitDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect database %v", err)
 
 	}
-	user := &model.User{ID: "1", Name: "timothy"}
-	todo := &model.Todo{ID: "1", Text: "this is the first todo", Done: false, User: user}
-	DBCon.Create(user)
-	DBCon.Create(todo)
-
 	log.Println("database connected succesfully")
 	autoMigration()
-
+	// usid := fmt.Sprintf("%v", uuid.NewV4())
+	// user := model.User{Name: "timothy", ID: usid}
+	// DBCon.Create(&user)
+	// todo := model.Todo{Text: "finish today's tickets", User: &user}
+	// DBCon.Create(&todo)
+	// time.Sleep(time.Millisecond * 5)
+	// var todofirst model.Todo
+	// DBCon.First(&todofirst)
+	// fmt.Println("this is the first", todofirst)
 	return DBCon, nil
 
 }
@@ -56,6 +59,6 @@ func Close() {
 
 func autoMigration() {
 	log.Println("automigration")
-	DBCon.AutoMigrate(&model.User{}, &model.Animal{}, &model.Todo{})
+	DBCon.AutoMigrate(&model.User{}, &model.Todo{})
 
 }

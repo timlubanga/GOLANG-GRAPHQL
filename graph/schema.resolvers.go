@@ -8,43 +8,54 @@ import (
 	"fmt"
 	"gqlgen-todos/graph/generated"
 	"gqlgen-todos/graph/model"
-	"math/rand"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo := &model.Todo{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", rand.Int()),
-		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
-	}
+	todo := r.TodosRepo.CreateTodo(model.NewTodo{
+		Text:   input.Text,
+		UserID: input.UserID,
+	})
 	// r.todos = append(r.todos, todo)
 	return todo, nil
 }
 
-func (r *mutationResolver) CreateAnimal(ctx context.Context, input model.NewAnimal) (*model.Animal, error) {
-	animal := &model.Animal{
-		Name:    input.Name,
-		Species: input.Species,
+func (r *mutationResolver) RegisterUser(ctx context.Context, input model.Userinput) (*model.AuthToken, error) {
+	user, err := r.UserRepo.GetUserByEmail(input.Email)
+	if err != nil {
+		return nil, err
 	}
-	// r.nil = append(r.animals, animal)
-	return animal, nil
-}
+	if user.Email != "" {
+		return nil, fmt.Errorf("user with the email addressed:%s provided exists", input.Email)
+	}
 
-func (r *mutationResolver) DeleteAnimal(ctx context.Context, input model.DeleteAnimal) ([]*model.Animal, error) {
-	// res := remove(r.animals, input.Index)
-	return nil, nil
+	user, err = r.UserRepo.RegisterUser(input)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := user.GenerateJWTToken()
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.AuthToken{
+		User:  user,
+		Token: token,
+	}, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return nil, nil
+	todos := r.TodosRepo.GetTodos()
+	return todos, nil
 }
 
-func (r *queryResolver) Animals(ctx context.Context) ([]*model.Animal, error) {
-	return nil, nil
+func (r *queryResolver) GetTodoByID(ctx context.Context) (*model.Todo, error) {
+	todo := r.TodosRepo.GetTodoById()
+	return todo, nil
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	return r.UserRepo.GetUsers(), nil
+func (r *queryResolver) GetUser(ctx context.Context, input model.Userinput) (*model.User, error) {
+	return nil, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -62,6 +73,6 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-// func remove(slice []*model.Animal, s int) []*model.Animal {
-// 	return append(slice[:s], slice[s+1:]...)
-// }
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	return r.UserRepo.GetUsers(), nil
+}

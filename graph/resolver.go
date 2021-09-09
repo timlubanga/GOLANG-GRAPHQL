@@ -1,7 +1,6 @@
 package graph
 
 import (
-	"gqlgen-todos/graph/model"
 	"gqlgen-todos/graph/postgres"
 )
 
@@ -10,7 +9,6 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	Todos    []*model.Todo
-	Animals  []*model.Animal
-	UserRepo postgres.UserRepo
+	TodosRepo postgres.TodosRepo
+	UserRepo  postgres.UserRepo
 }

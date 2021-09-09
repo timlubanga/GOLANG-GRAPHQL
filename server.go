@@ -30,7 +30,8 @@ func main() {
 
 	defer postgres.Close()
 	c := generated.Config{
-		Resolvers:  &graph.Resolver{Todos: nil, Animals: nil, UserRepo: postgres.UserRepo{DB: db}},
+		Resolvers: &graph.Resolver{TodosRepo: postgres.TodosRepo{DB: db},
+			UserRepo: postgres.UserRepo{DB: db}},
 		Directives: generated.DirectiveRoot{},
 		Complexity: generated.ComplexityRoot{},
 	}

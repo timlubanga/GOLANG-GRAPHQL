@@ -6,23 +6,27 @@ type Todo {
   id: ID!
   text: String!
   done: Boolean!
+  user_id: String!
   user: User!
 }
 
 type User {
-  id: ID!
-  name: String!
+  id: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
 }
 
-type Animal {
-  name: String!
-  species: String!
+type AuthToken {
+  user: User!
+  token: String!
 }
 
 type Query {
   todos: [Todo!]!
-  animals: [Animal!]!
-  users: [User!]!
+  getTodoById: Todo!
+  GetUser(input: Userinput!): User!
 }
 
 input NewTodo {
@@ -30,16 +34,15 @@ input NewTodo {
   userId: String!
 }
 
-input DeleteAnimal {
-  index: Int!
+input Userinput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  confirmPassword: String!
 }
 
-input NewAnimal {
-  name: String!
-  species: String!
-}
 type Mutation {
   createTodo(input: NewTodo!): Todo!
-  createAnimal(input: NewAnimal!): Animal!
-  deleteAnimal(input: DeleteAnimal!): [Animal!]!
+  registerUser(input: Userinput!): AuthToken!
 }

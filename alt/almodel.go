@@ -4,9 +4,7 @@ package model
 
 import (
 	"fmt"
-	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type AuthToken struct {
@@ -42,25 +40,6 @@ func (s *User) GenerateHashedPassword() error {
 	}
 	s.Password = string(passHash)
 	return nil
-}
-
-func (s *User) GenerateJWTToken() (string, error) {
-	mySigningKey := []byte("AllFortheLoveofAuthentication")
-	twoDays := time.Hour * 24 * 2
-
-	expirationTime := time.Now().Add(twoDays).UnixNano() / 1000000
-	// Create the Claims
-	claims := &jwt.StandardClaims{
-		ExpiresAt: expirationTime,
-		Issuer:    "jwtforGQL",
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(mySigningKey)
-
-	if err != nil {
-		return "", err
-	}
-	return ss, err
 }
 
 type Userinput struct {
